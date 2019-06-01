@@ -1,6 +1,10 @@
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 module.exports = {
   mode:"development",
-  entry:"./src/js/index.js",
+  entry:{
+    // vendor:['react','react-dom'],
+    index:"./src/js/index.js",
+  },
   output:{
     filename:"./index.js",
   },
@@ -10,12 +14,31 @@ module.exports = {
   module:{
     rules:[
       {
-        test:/\.js|jsx$/,
-        loader:['babel-loader']
+        test:/\.html$/,
+        use:[
+          {
+            loader:'html-loader'
+          }
+        ]
+      },
+      {
+        test:/\.(js|jsx)$/,
+        // loader:'babel-loader',
+        // options:{
+        //   presets:['@babel/preset-env','@babel/preset-react']
+        // },
+
+        use:{
+          loader:"babel-loader",
+          options:{
+            presets:['@babel/preset-env','@babel/preset-react']
+          },
+        },
+        exclude:/node_modules/
       },
       {
         test: /\.css$/,
-        loader: "style!css"
+        loader: "style-loader!css-loader"
       },      
       {
         test:/\.png$/,
@@ -26,5 +49,11 @@ module.exports = {
         loader:"file-loader",
       }
     ]
-  }
+  },
+  plugins:[
+    new HtmlWebPackPlugin({
+      template:"./src/index.html",
+      filename:"./index.html"
+    })
+  ]
 }
