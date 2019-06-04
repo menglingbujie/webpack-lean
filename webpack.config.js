@@ -1,4 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CleanWebpackPlugin} = require("clean-webpack-plugin");
+const webpack = require("webpack");
 module.exports = {
   mode:"development",
   entry:{
@@ -23,11 +26,6 @@ module.exports = {
       },
       {
         test:/\.(js|jsx)$/,
-        // loader:'babel-loader',
-        // options:{
-        //   presets:['@babel/preset-env','@babel/preset-react']
-        // },
-
         use:{
           loader:"babel-loader",
           options:{
@@ -37,9 +35,20 @@ module.exports = {
         exclude:/node_modules/
       },
       {
-        test: /\.css$/,
-        loader: "style-loader!css-loader"
-      },      
+        test: /\.(css|less)$/,
+        use:[
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options:{
+              minimize:true,
+              hmr:process.env.NODE_ENV==="development",
+            }
+          },
+          // 'style-loader',
+          'css-loader',
+          'less-loader'
+        ]
+      },
       {
         test:/\.png$/,
         loader:"url-loader?limit=1",
@@ -54,6 +63,29 @@ module.exports = {
     new HtmlWebPackPlugin({
       template:"./src/index.html",
       filename:"./index.html"
-    })
+    }),
+    new MiniCssExtractPlugin({
+      filename:'[name].css',
+      chunkFilename:"[id].css"
+    }),
+    new CleanWebpackPlugin(),
+    // new webpack.optimize.SplitChunksPlugin({
+    //   cacheGroups:{
+    //     // common:{
+    //     //   chunks:'initial',
+    //     //   minSize:0,
+    //     //   minChunks:2,
+    //     // },
+    //     vendor:{
+    //       priority:1,
+    //       test:/node_modules/,
+    //       chunks:'initial',
+    //       minSize:0,
+    //       minChunks:2,
+    //       name:['react','react-dome'],
+    //       enforce:true
+    //     }
+    //   }
+    // })
   ]
 }
